@@ -1,0 +1,79 @@
+extends ./surveysbase.pug
+
+block append scripts
+
+  if cookieOptOut.acceptAnalytics
+    script(
+      id="recaptchaAPI"
+      type="text/javascript"
+      src="https://www.google.com/recaptcha/api.js"
+    )
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      h1(class="display-3 mb-3") Generate Response Tokens
+      p(class="mb-0"): a(href=`${upOneLevel}` class="btn btn-secondary") Return
+
+    -
+      var tokensName = "gZIPCode";
+      var advancedName = "gPassword";
+      var tokensError, generationError, recaptchaError;
+      if (errors) {
+        tokensError = errors.find(el => el.param === tokensName);
+        generationError = errors.find(el => el.param === "generation");
+        recaptchaError = errors.find(el => el.param === "g-recaptcha-response");
+      }
+    noscript: div(class="alert alert-danger px-4 mb-0") Please enable JavaScript to load all elements.
+    if !cookieOptOut.acceptAnalytics
+      div(class="analyticsCookieNotice")
+        p(class="alert alert-danger px-4 mb-0") Cookie settings must be set to accept analytics cookies to load all elements.
+    else if generationError
+      div(class="alert alert-danger px-4 mb-0" id="gErrorDiv") #{generationError.msg}
+    else if recaptchaError
+      div(class="alert alert-danger px-4 mb-0" id="gErrorDiv") #{recaptchaError.msg}
+    else if errors
+      div(class="alert alert-danger px-4 mb-0" id="gErrorDiv") There are errors marked below:
+
+  div(class="bg-light g-0 pt-4 px-4")
+    form(
+      method="POST"
+      id="7-20-form"
+    )
+      input(type="hidden" name="time" value=timeOfLoad)
+      input(type="hidden" name="_csrf" value=csrfToken)
+      div(class="mb-4")
+        label(class="form-label" for=tokensName) Number of Tokens to Generate
+        input(
+          type="text"
+          class=(tokensError) ? "form-control is-invalid" : "form-control"
+          name=tokensName
+          id=tokensName
+          value=(selected && selected.gZIPCode) ? selected.gZIPCode : ""
+          autocomplete="off"
+          maxlength="6"
+          aria-describedby=(tokensError) ? `${tokensName}Feedback` : "undefined"
+        )
+        if tokensError
+          div(id=`${tokensName}Feedback` class="invalid-feedback") #{tokensError.msg}
+      div(class="advanced-form mb-4")
+        label(class="form-label" for=advancedName) Password
+        input(
+          type="text"
+          class="form-control"
+          name=advancedName
+          id=advancedName
+          value=(selected) ? selected.gPassword : ""
+          maxlength="50"
+          autocomplete="off"
+          tabindex="-1"
+        ) 
+      div(class="pb-4")
+        button(
+          type="submit" 
+          class="btn btn-secondary g-recaptcha"
+          data-sitekey=recaptchaSiteKey
+          data-callback="generateTokensSubmit"
+          data-action="submit"
+        ) Generate Tokens

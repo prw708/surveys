@@ -1,0 +1,38 @@
+extends ../../views/base.pug
+
+block append scripts
+  script(
+    type="text/javascript"
+    src="https://www.gstatic.com/charts/loader.js"
+  )
+  script(
+    type="text/javascript"
+    src="/projects/surveys/static/utils.js"
+  )
+  script(
+    type="text/javascript"
+    src="/projects/surveys/static/formHandlers.js"
+  )
+  script(
+    type="text/javascript"
+    src="/projects/surveys/static/chart.js"
+  )
+  script(
+    type="text/javascript"
+    src="/projects/surveys/static/main.js"
+  )
+
+block content
+
+  if breadcrumbs
+    nav(class="px-4 pt-2" aria-label="breadcrumb")
+      ol(class="breadcrumb")
+        for item in breadcrumbs
+          if (item === breadcrumbs[breadcrumbs.length - 1])
+            li(class="breadcrumb-item active" aria-current="page")
+              small #{item.name}
+          else
+            li(class="breadcrumb-item")
+              small: a(href=item.path) #{item.name}
+
+  block surveysContent

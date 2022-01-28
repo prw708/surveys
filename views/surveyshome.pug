@@ -1,0 +1,64 @@
+extends ./surveysbase.pug
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    if loggedInAs
+      header(class="row p-4 g-0")
+        h1(class="display-3") Survey Generator
+        p(class="lead mb-3") Create and respond to surveys
+        p(class="mb-0")
+          a(href=`${basepath}/dashboard` class="btn btn-secondary me-2") Dashboard
+    else
+      header(class="row col-10 col-md-8 col-lg-6 mx-auto py-10 g-0")
+        h1(class="display-3") Survey Generator
+        p(class="lead mb-3") Create and respond to surveys
+        p(class="mb-0")
+          a(href="/website/account/login" class="btn btn-secondary me-2") Login
+          a(href="/website/account/register" class="btn btn-secondary me-2") Register
+
+    if success
+      div(class="alert alert-success px-4 mb-0") #{success}
+    else if error
+      div(class="alert alert-danger px-4 mb-0") #{error}
+
+  div(class="px-4")
+    if loggedInAs && surveys && surveys.length > 0
+      h2(class="mt-4 mb-4") Open Surveys
+      div(class="row row-cols-1 row-cols-md-3 g-4")
+        for survey of surveys
+          div(class="col")
+            div(class="card")
+              a(
+                href=`${basepath}/survey/${survey.uuid}` 
+                class="list-group-item list-group-item-action p-0 border-0"
+              )
+                div(class="card-body")
+                  h5(class=(!survey.description) ? "card-title mb-0" : "card-title") #{survey.title}
+                  p(class="card-text") #{survey.description}
+              div(class="card-footer")
+                small(class="text-muted") Created #{survey.created}
+      nav(class="mt-4 mb-4")
+        ul(class="pagination mb-0 justify-content-center")
+          li(
+            class=((currentPage - 1) < startPage) ? "page-item disabled" : "page-item"
+          )
+            a(
+              class="page-link"
+              href=`?p=${currentPage - 1}`
+            ) Previous
+          for page of pages
+            li(
+              class=(page === currentPage) ? "page-item active" : "page-item"
+            )
+              a(
+                class="page-link"
+                href=`?p=${page}`
+              ) #{page}
+          li(
+            class=((currentPage + 1) > endPage) ? "page-item disabled" : "page-item"
+          )
+            a(
+              class="page-link"
+              href=`?p=${currentPage + 1}`
+            ) Next

@@ -1,0 +1,36 @@
+extends ./surveysbase.pug
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      h1(class="display-3") #{title}
+      p(class="lead mb-3") Token listing for survey #{surveyId}
+      p(class="mb-0"): a(href=`${upOneLevel}` class="btn btn-secondary") Return
+
+    if error 
+      div(class="alert alert-danger px-4 mb-4") #{error}
+
+  if responses
+    div(class="row bg-light g-0 pt-4 px-4")
+      if survey.responseType === 'Tokens'
+        p(class="mb-4") Share one link to each respondent without overlapping so that they can access the survey and submit a response.
+      else
+        p(class="mb-4") The following are responses from members.
+      div(class="table-responsive")
+        table(class="table table-borderless mb-4")
+          tr
+            th Token
+            th Available
+            th Created On
+            th Used On
+          for response in responses
+            tr
+              td
+                if (response.active && survey.active) 
+                  a(href=`${basepath}/token/${response.uuid}`) #{response.uuid}
+                else
+                  | #{response.uuid}
+              td #{(response.active) ? "Yes" : "No"}
+              td #{response.created}
+              td #{response.responded}

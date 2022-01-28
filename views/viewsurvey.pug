@@ -1,0 +1,152 @@
+extends ./surveysbase.pug
+
+block append scripts
+
+  if cookieOptOut.acceptAnalytics
+    script(
+      id="recaptchaAPI"
+      type="text/javascript"
+      src="https://www.google.com/recaptcha/api.js"
+    )
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      if (survey && survey.description)
+        h1(class="display-3") #{survey.title}
+        p(class="lead mb-0") #{survey.description}
+      else if (survey && !survey.description)
+        h1(class="display-3 mb-0") #{survey.title}
+      else
+        h1(class="display-3 mb-0") View Survey
+      if !active || !surveyActive
+        p(class="mt-3 mb-0"): a(href=`/return?b=${back}` class="btn btn-secondary") Return
+
+    noscript: div(class="alert alert-danger px-4 mb-0") Please enable JavaScript to load all elements.
+    if !cookieOptOut.acceptAnalytics
+      div(class="analyticsCookieNotice")
+        p(class="alert alert-danger px-4 mb-0") Cookie settings must be set to accept analytics cookies to load all elements.
+    else if error
+      div(class="alert alert-danger px-4 mb-0" id="vErrorDiv") #{error}
+    else if surveyActive === false
+      div(class="alert alert-danger px-4 mb-4" id="vErrorDiv") The survey is closed.
+    else if active === false
+      div(class="alert alert-danger px-4 mb-4" id="vErrorDiv") The token is not active.
+    else if errors
+      div(class="alert alert-danger px-4 mb-0" id="vErrorDiv") There are errors marked below:
+
+  if survey && surveyActive
+    div(class="bg-light g-0 pt-4 px-4")
+      form(
+        method="POST"
+        id="22-19-form"
+      )
+        input(type="hidden" name="time" value=timeOfLoad)
+        input(type="hidden" name="_csrf" value=csrfToken)
+        - var advancedName = "sUsername";
+        div(class="advanced-form mb-4")
+          label(class="form-label" for=advancedName) Username
+          input(
+            type="text"
+            class="form-control"
+            name=advancedName
+            id=advancedName
+            value=""
+            disabled=(active) ? false : true
+            maxlength="50"
+            autocomplete="off"
+            tabindex="-1"
+          )
+        - var i = -1;
+        for item in survey.questions
+          - 
+            i++;
+            var ratings = [1, 2, 3, 4, 5];
+            var textboxId = "sTextbox[" + i + "]";
+            var radioItemName = "sRating[" + i + "]";
+            var hiddenRadioItemId = "hidden-" + radioItemName;
+            var yesNos = [1, 0];
+            var yesNoName = "sYesNo[" + i + "]";
+            var hiddenYesNoId = "hidden-" + yesNoName;
+            var indexedError;
+            if (errors) {
+              indexedError = errors[i];
+            }
+          div(class="mb-4")
+            h5 #{item.promptText}
+            if item.promptType === 'Textbox'
+              textarea(
+                class=(indexedError) ? "form-control is-invalid" : "form-control"
+                name=textboxId
+                id=textboxId
+                rows="2"
+                disabled=(active) ? false : true
+                aria-describedby=(indexedError) ? `${textboxId}Feedback` : "undefined"
+              )= (active && selected) ? selected[i] : ""
+              if indexedError
+                div(id=`${textboxId}Feedback` class="invalid-feedback") #{indexedError.msg}
+            else if item.promptType === 'Rating'
+              input(
+                type="hidden"
+                name=radioItemName
+                id=hiddenRadioItemId
+                value="0"
+              )
+              for rating in ratings
+                - 
+                  var radioItemId = "sRating[" + i + "][" + rating + "]";
+                  var radioItemErrorId = radioItemId + "Error";
+                div(class="form-check form-check-inline col-1")
+                  input(
+                    class=(indexedError) ? "form-check-input is-invalid" : "form-check-input"
+                    type="radio"
+                    name=radioItemName
+                    id=radioItemId
+                    value=rating
+                    disabled=(active) ? false : true
+                    checked=(active && selected) ? ((selected[i] === rating) ? true : false) : false
+                    aria-describedby=(rating === ratings[ratings.length - 1] && indexedError) 
+                      ? radioItemErrorId : undefined
+                  )
+                  label(class="form-check-label" for=radioItemId) #{rating}
+                if rating === ratings[ratings.length - 1] && indexedError
+                  div(class="input-group")
+                    span(class="is-invalid")
+                    div(id=radioItemErrorId class="invalid-feedback") #{indexedError.msg}
+            else if item.promptType === 'YesNo'
+              input(
+                type="hidden"
+                name=yesNoName
+                id=hiddenYesNoId
+                value="-1"
+              )
+              for yesNo in yesNos
+                - var yesNoId = sYesNoName + "[" + yesNo + "]";
+                div(class="form-check form-check-inline col-2")
+                  input(
+                    class=(indexedError) ? "form-check-input is-invalid" : "form-check-input"
+                    type="radio"
+                    name=yesNoName
+                    id=yesNoId
+                    value=yesNo
+                    disabled=(active) ? false : true
+                    checked=(active && selected) ? ((selected[i] === yesNo) ? true : false) : false
+                    aria-describedby=(indexedError) ? `${yesNoId}Feedback` : "undefined"
+                  )
+                  label(class="form-check-label" for=yesNoId) #{(yesNo === 1) ? "Yes" : "No"}
+                if yesNo === yesNos[yesNos.length - 1] && indexedError
+                  div(class="input-group")
+                    span(class="is-invalid")
+                    div(id=`${yesNoId}Feedback` class="invalid-feedback") #{indexedError.msg}
+        if active
+          div(class="pb-4")
+            p Click the button below to respond to the survey. Once submitted, the response cannot be modified.
+            button(
+              type="submit" 
+              disabled=(active) ? false : true
+              class="btn btn-secondary g-recaptcha"
+              data-sitekey=recaptchaSiteKey
+              data-callback="viewSurveySubmit"
+              data-action="submit"
+            ) Submit

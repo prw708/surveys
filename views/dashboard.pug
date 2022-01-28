@@ -1,0 +1,97 @@
+extends ./surveysbase.pug
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    if loggedInAs
+      header(class="row p-4 g-0")
+        h1(class="display-3") Surveys Dashboard
+        p(class="lead mb-3") Information about your surveys
+        p(class="mb-0")
+          a(href=`${basepath}/dashboard/create` class="btn btn-secondary me-2") Create Survey
+    else
+      header(class="row col-10 col-md-8 col-lg-6 mx-auto py-10 g-0")
+        h1(class="display-3") Surveys Dashboard
+        p(class="lead mb-3") Information about your surveys
+        p(class="mb-0")
+          a(href=`/website/account/login` class="btn btn-secondary me-2") Login
+          a(href=`/website/account/register` class="btn btn-secondary me-2") Register
+
+    if success
+      div(class="alert alert-success px-4 mb-0") #{success}
+    else if error
+      div(class="alert alert-danger px-4 mb-0") #{error}
+
+  div(class="row g-0")
+
+    if loggedInAs
+      if surveys && surveys.length > 0
+        div(class="col-md-4 col-lg-3 p-4")
+          ul(class="nav nav-pills flex-column")
+            li(class="nav-item")
+              h5: a(class="text-body text-decoration-none" href=`${basepath}/dashboard`) Surveys
+              for survey in surveys
+                li(class="nav-item")
+                  if (selected && selected.uuid === survey.uuid)
+                    a(class="nav-link active" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
+                  else
+                    a(class="nav-link" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
+
+        div(class="col-md-8 col-lg-9 p-4")
+          if selected
+            h2(class="pb-1 mb-4") #{selected.title}
+            h4(class="border-bottom pb-1 mb-4") Actions
+            dl(class="mb-0")
+              dt(class="mb-1") View
+              dd(class="mb-3") 
+                a(class="btn btn-secondary me-2 mb-2" href=`${basepath}/dashboard/${selected.uuid}/view`) View
+                a(class="btn btn-secondary me-2 mb-2" href=`${basepath}/dashboard/${selected.uuid}/results`) Results
+              dt(class="mb-1") Responses
+              dd(class="mb-3") 
+                a(
+                  class=(selected.responseType === "Tokens" && selected.active) ? 
+                        "btn btn-success me-2 mb-2" : 
+                        "btn btn-success me-2 mb-2 disabled"
+                  href=`${basepath}/dashboard/${selected.uuid}/generate`
+                ) Generate Tokens
+                a(class="btn btn-success me-2 mb-2" href=`${basepath}/dashboard/${selected.uuid}/tokens`) Available Tokens
+              dt(class="mb-1") Deactivate
+              dd(class="mb-3") 
+                a(
+                  class=(selected.active) ?   
+                        "btn btn-danger me-2 mb-2" :
+                        "btn btn-danger me-2 mb-2 disabled" 
+                  href=`${basepath}/dashboard/${selected.uuid}/close`
+                ) Close
+                a(class="btn btn-danger me-2 mb-2" href=`${basepath}/dashboard/${selected.uuid}/delete`) Delete
+            h4(class="border-bottom pb-1 mb-4") Details
+            dl(class="mb-0")
+              dt(class="mb-1") Description
+              dd(class="mb-4") #{(selected.description === "") ? "None" : selected.description}
+              dt(class="mb-1") Created
+              dd(class="mb-4") #{selected.created}
+              dt(class="mb-1") Active
+              dd(class="mb-4") #{(selected.active) ? "Yes" : "No"}
+              dt(class="mb-1") Questions
+              dd(class="mb-4") #{selected.questions.length}
+              dt(class="mb-1") Who Can Respond
+              dd(class="mb-4") #{(selected.responseType === "Tokens") ? "Anyone With a Token" : "All Members"}
+              dt(class="mb-1") Responses Completed
+              dd(class="mb-4") #{selected.responsesCompleted}
+              dt(class="mb-1") Max Tokens 
+              dd(class="mb-0") #{selected.maxTokens}
+          else
+            div(id="dashboard")
+              h2(class="pb-1 mb-4") Overview
+              div(id="sChart" class="mb-4")
+              div(class="table-responsive")
+                table(id="sData" class="table mb-2")
+                  tr
+                    th Survey
+                    th Responses Completed
+                    th All Responses
+                  for survey in surveys
+                    tr
+                      td #{survey.title}
+                      td #{survey.responsesCompleted}
+                      td #{survey.allResponses}

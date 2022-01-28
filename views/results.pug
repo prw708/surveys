@@ -1,0 +1,54 @@
+extends ./surveysbase.pug
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      if survey
+        h1(class="display-3") Survey Results
+        p(class="lead mb-3") Results for #{survey.title}
+        p(class="mb-3") Responses Completed: #{survey.responsesCompleted}
+      else
+        h1(class="display-3 mb-3") Survey Results
+      p(class="mb-0"): a(href=`${upOneLevel}` class="btn btn-secondary") Return
+
+    if error
+      div(class="alert alert-danger px-4 mb-0") #{error}
+
+  if survey
+    div(class="bg-light g-0 px-4")
+      - var i = -1;
+      for item in survey.questions
+        - i++;
+        if (i === 0)
+          h5(class="pt-4") #{item.promptText}
+        else
+          h5 #{item.promptText}
+        if item.promptType === 'Textbox'
+          div(class="row g-0 pb-4")
+            textarea(class="form-control" rows="10" disabled)
+              for response in responses[i]
+                if response
+                  | #{response}
+                  | 
+                  |
+        else if item.promptType === 'Rating' 
+          div(class="row g-0 pb-4")
+            - var j = 0;
+            for response in responses[i]
+              div(class="col-2 col-sm-2 pb-2 pb-sm-0") #[strong #{j + 1}]
+                div #{response}
+                div(class="d-none d-sm-block") (#{percentages[i][j]}%)
+              - j++;
+            div(class="col-2 col-sm-2") #[strong AVG]
+              div #{averages[i]}
+        else if item.promptType === 'YesNo' 
+          div(class="row g-0 pb-4")
+            div(class="col-4 col-sm-2") #[strong Yes] 
+              div #{responses[i][1]}
+              div(class="d-none d-sm-block") (#{percentages[i][1]}%)
+            div(class="col-4 col-sm-2") #[strong No] 
+              div #{responses[i][0]}
+              div(class="d-none d-sm-block") (#{percentages[i][0]}%)
+            div(class="col-4 col-sm-2") #[strong AVG]
+              div #{averages[i]}

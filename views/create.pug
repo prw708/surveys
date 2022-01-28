@@ -1,0 +1,207 @@
+extends ./surveysbase.pug
+
+block append scripts
+
+  if cookieOptOut.acceptAnalytics
+    script(
+      id="recaptchaAPI"
+      type="text/javascript"
+      src="https://www.google.com/recaptcha/api.js"
+    )
+
+block surveysContent
+
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      h1(class="display-3") Create Survey
+      p(class="lead mb-3") Survey creation form
+      p(class="mb-0"): a(href=`/return?b=${back}` class="btn btn-secondary") Return
+
+    - 
+      if (errors) {
+        insertionError = errors.find(el => el.param === "insertion");
+        recaptchaError = errors.find(el => el.param === "g-recaptcha-response");
+      }
+    noscript: div(class="alert alert-danger px-4 mb-0") Please enable JavaScript to load all elements.
+    if !cookieOptOut.acceptAnalytics
+      div(class="analyticsCookieNotice")
+        p(class="alert alert-danger px-4 mb-0") Cookie settings must be set to accept analytics cookies to load all elements.
+    else if insertionError
+      div(class="alert alert-danger px-4 mb-0" id="sErrorDiv") #{insertionError.msg}
+    else if recaptchaError
+      div(class="alert alert-danger px-4 mb-0" id="sErrorDiv") #{recaptchaError.msg}
+    else if errors
+      div(class="alert alert-danger px-4 mb-0" id="sErrorDiv") There are errors marked below:
+
+  div(class="bg-light g-0 pt-4 px-4")
+    form(
+      method="POST"
+      id="3-19-form"
+    )
+      input(type="hidden" name="time" value=timeOfLoad)
+      input(type="hidden" name="_csrf" value=csrfToken)
+      -
+        var titleName = "sWebsite";
+        var descriptionName = "sAddress";
+        var responsesName = "sLastName";
+        var advancedName = "sFirstName";
+        if (errors) {
+          titleError = errors.find(el => el.param === titleName);
+          descriptionError = errors.find(el => el.param === descriptionName);
+          responsesError = errors.find(el => el.param === responsesName);
+        }
+      div(class="mb-4")
+        label(class="form-label" for=titleName) Title
+        input(
+          type="text"
+          class=(titleError) ? "form-control is-invalid" : "form-control"
+          name=titleName
+          id=titleName
+          value=(selected) ? selected.sWebsite : ""
+          autocomplete="off"
+          maxlength="50"
+          aria-describedby=(titleError) ? `${titleName}Feedback` : "undefined"
+        )
+        if titleError
+          div(id=`${titleName}Feedback` class="invalid-feedback") #{titleError.msg}
+      div(class="mb-4")
+        label(class="form-label" for=descriptionName) Description
+        textarea(
+          class=(descriptionError) ? "form-control is-invalid" : "form-control"
+          name=descriptionName
+          id=descriptionName
+          maxlength="150"
+          rows="3"
+          aria-describedby=(descriptionError) ? `${descriptionName}Feedback` : "undefined"
+        )= (selected) ? selected.sAddress : ""
+        if descriptionError
+          div(id=`${descriptionName}Feedback` class="invalid-feedback") #{descriptionError.msg}
+      div(class="mb-4")
+        p(class="mb-2") Response Type
+        - 
+          var responses = ["Tokens", "Members"];
+          var responsesText = ["Open to Those with a Token", "Open to All Members"];
+          var i = 0;
+        for response in responses
+          - var responsesId = responsesName + "[" + i + "]";
+          div(class="form-check")
+            input(
+              class=(responsesError) ? "form-check-input is-invalid" : "form-check-input"
+              type="radio"
+              name=responsesName
+              id=responsesId
+              value=response
+              checked=(selected) ? ((selected.sLastName === response) ? true : false) : false
+              aria-describedby=(responsesError) ? `${responsesId}Feedback` : "undefined"
+            )
+            label(class="form-check-label" for=responsesId) #{responsesText[i]}
+          if response === responses[responses.length - 1] && responsesError
+            div(class="input-group")
+              span(class="is-invalid")
+              div(id=`${responsesId}Feedback` class="invalid-feedback") #{responsesError.msg}
+          - i++;
+      div(class="advanced-form mb-4")
+        label(class="form-label" for=advancedName) First Name
+        input(
+          type="text"
+          class="form-control"
+          name=advancedName
+          id=advancedName
+          value=(selected) ? selected.sFirstName : ""
+          maxlength="50"
+          autocomplete="off"
+          tabindex="-1"
+        )
+      - 
+        if (selected) {
+          var index = [];
+          var radioId = [], radioName = [], radioError = [];
+          var itemId = [], itemName = [], itemError = [];
+          if (selected.sItem) {
+            for (var i = 0; i < selected.sItem.length; i++) {
+              index[i] = i;
+              radioId[i] = "sRadioItem" + i;
+              radioName[i] = "sRadioItem[" + i + "]";
+              itemId[i] = "sItem" + i;
+              itemName[i] = "sItem[" + i + "]";
+              if (errors) {
+                itemError[i] = errors.find(el => el.param === itemName[i]);
+                radioError[i] = errors.find(el => el.param === radioName[i]);
+              } else {
+                itemError[i] = null;
+                radioError[i] = null;
+              }
+            }
+          }
+        }
+      if selected
+        for i in index
+          div(class="mb-4")
+            div(class="form-check mb-2")
+              input(
+                class=(radioError[i]) ? "form-check-input is-invalid" : "form-check-input"
+                type="radio"
+                name=radioName[i]
+                id=radioId[i]
+                value=selected.sRadioItem[i]
+                checked
+              )
+              label(class="form-check-label" for=radioId[i]) #{selected.sRadioItem[i]} Prompt ##{i + 1}
+              if radioError[i]
+                div(id=`${radioId[i]}Feedback` class="invalid-feedback") #{radioError[i].msg}
+            textarea(
+              class=(itemError[i]) ? "form-control is-invalid" : "form-control"
+              name=itemName[i]
+              id=itemId[i]
+              maxlength="150"
+              rows="2"
+              aria-describedby=(itemError[i]) ? `${itemId[i]}Feedback` : "undefined"
+            ) #{selected.sItem[i]}
+            if itemError[i]
+              div(id=`${itemId[i]}Feedback` class="invalid-feedback") #{itemError[i].msg}
+      div(class="mb-4")
+        -
+          var remaining = maxItems;
+          if (index)
+            remaining -= index.length;
+        h5(class="mb-4" id="EditSurveyItem") Survey Items (#{remaining})
+        div(class="form-check")
+          input(
+            class="form-check-input"
+            type="radio"
+            name="sAddItem"
+            id="sAddTextbox"
+            value="Textbox"
+            checked
+          )
+          label(class="form-check-label" for="sAddTextbox") Textbox
+        div(class="form-check")
+          input(
+            class="form-check-input"
+            type="radio"
+            name="sAddItem"
+            id="sAddRating"
+            value="Rating"
+          )
+          label(class="form-check-label" for="sAddRating") Rating
+        div(class="form-check")
+          input(
+            class="form-check-input"
+            type="radio"
+            name="sAddItem"
+            id="sAddYesNo"
+            value="YesNo"
+          )
+          label(class="form-check-label" for="sAddYesNo") Yes/No
+        div(class="mt-4")
+          button(type="button" class="btn btn-success me-2" id="sAddSurveyItemBtn" data-maxItems=maxItems) Add
+          button(type="button" class="btn btn-danger" id="sRemoveSurveyItemBtn" data-maxItems=maxItems) Remove
+      div(class="pb-4")
+        p Click the button below to create the survey. Once created, the survey cannot be modified.
+        button(
+          type="submit" 
+          class="btn btn-secondary g-recaptcha"
+          data-sitekey=recaptchaSiteKey
+          data-callback="createSurveySubmit"
+          data-action="submit"
+        ) Finalize and Create Survey
