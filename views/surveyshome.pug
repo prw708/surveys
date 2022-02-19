@@ -35,7 +35,7 @@ block surveysContent
               )
                 div(class="card-body")
                   h5(class=(!survey.description) ? "card-title mb-0" : "card-title") #{survey.title}
-                  p(class="card-text") #{survey.description}
+                  p(class="preserve-white-space card-text") #{survey.description}
               div(class="card-footer")
                 small(class="text-muted") Created #{survey.created}
       nav(class="mt-4 mb-4")

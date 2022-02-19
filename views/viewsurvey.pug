@@ -15,7 +15,7 @@ block surveysContent
     header(class="row p-4 g-0")
       if (survey && survey.description)
         h1(class="display-3") #{survey.title}
-        p(class="lead mb-0") #{survey.description}
+        p(class="lead preserve-white-space mb-0") #{survey.description}
       else if (survey && !survey.description)
         h1(class="display-3 mb-0") #{survey.title}
       else

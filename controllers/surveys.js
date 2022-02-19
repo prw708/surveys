@@ -40,7 +40,7 @@ exports.create_post = [
     .trim()
     .isLength({ min: 1, max: 50 })
     .matches(/^[A-Za-z0-9 \-]+$/)
-    .whitelist('A-Za-z0-9 \-')
+    .whitelist('A-Za-z0-9 \\-')
     .escape(),
   // Description
   body('sAddress', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
@@ -48,7 +48,7 @@ exports.create_post = [
     .optional()
     .isLength({ max: 150 })
     .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\-\.\?!,\\s')
+    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
     .escape(),
   // Responses
   body('sLastName', 'Must be a valid response type.')
@@ -63,7 +63,7 @@ exports.create_post = [
     .trim()
     .isLength({ min: 1, max: 150 })
     .matches(/^[A-Za-z0-9\-\.\?!,\s]+$/)
-    .whitelist('A-Za-z0-9\-\.\?!,\\s')
+    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
     .escape(),
   body('time', 'Invalid value.')
     .trim()
@@ -244,7 +244,7 @@ exports.uuid_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -317,7 +317,7 @@ exports.view_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -361,7 +361,7 @@ exports.generate_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -411,7 +411,7 @@ exports.generate_post = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   // Tokens
   body('gZIPCode', 'Must be a positive integer.')
@@ -564,7 +564,7 @@ exports.close_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -609,7 +609,7 @@ exports.close_post = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   // Delete
   body('cWebsite', 'Must be a boolean.')
@@ -738,7 +738,7 @@ exports.delete_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -778,7 +778,7 @@ exports.delete_post = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   // Delete
   body('dPhone', 'Must be a boolean.')
@@ -881,7 +881,7 @@ exports.tokens_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -969,7 +969,7 @@ exports.results_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -1064,7 +1064,7 @@ exports.token_uuid_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -1136,13 +1136,13 @@ exports.token_uuid_post = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
     .trim()
     .isLength({ max: 150 })
     .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\-\.\?!,\\s')
+    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
     .escape(),
   body('sRating.*', 'Must be an integer from 1 to 5.')
     .trim()
@@ -1349,7 +1349,7 @@ exports.survey_response_get = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   function(req, res, next) {
     let errors = validationResult(req);
@@ -1427,13 +1427,13 @@ exports.survey_response_post = [
     .trim()
     .isLength({ min: 36, max: 36 })
     .matches(/^[A-Fa-f0-9\-]{36}$/)
-    .whitelist('A-Fa-f0-9\-')
+    .whitelist('A-Fa-f0-9\\-')
     .escape(),
   body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
     .trim()
     .isLength({ max: 150 })
     .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\-\.\?!,\\s')
+    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
     .escape(),
   body('sRating.*', 'Must be an integer from 1 to 5.')
     .trim()
