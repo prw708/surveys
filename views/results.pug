@@ -26,7 +26,7 @@ block surveysContent
           h5 #{item.promptText}
         if item.promptType === 'Textbox'
           div(class="row g-0 pb-4")
-            textarea(class="form-control" rows="10" disabled)
+            textarea(class="form-control overflow-auto" rows="10" disabled)
               for response in responses[i]
                 if response
                   | #{response}

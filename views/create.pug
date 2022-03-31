@@ -67,7 +67,7 @@ block surveysContent
       div(class="mb-4")
         label(class="form-label" for=descriptionName) Description
         textarea(
-          class=(descriptionError) ? "form-control is-invalid" : "form-control"
+          class=(descriptionError) ? "form-control overflow-auto is-invalid" : "form-control overflow-auto"
           name=descriptionName
           id=descriptionName
           maxlength="150"
@@ -150,7 +150,7 @@ block surveysContent
               if radioError[i]
                 div(id=`${radioId[i]}Feedback` class="invalid-feedback") #{radioError[i].msg}
             textarea(
-              class=(itemError[i]) ? "form-control is-invalid" : "form-control"
+              class=(itemError[i]) ? "form-control overflow-auto is-invalid" : "form-control overflow-auto"
               name=itemName[i]
               id=itemId[i]
               maxlength="150"

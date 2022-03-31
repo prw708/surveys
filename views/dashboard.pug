@@ -29,13 +29,13 @@ block surveysContent
         div(class="col-md-4 col-lg-3 p-4")
           ul(class="nav nav-pills flex-column")
             li(class="nav-item")
-              h5: a(class="text-body text-decoration-none" href=`${basepath}/dashboard`) Surveys
-              for survey in surveys
-                li(class="nav-item")
-                  if (selected && selected.uuid === survey.uuid)
-                    a(class="nav-link active" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
-                  else
-                    a(class="nav-link" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
+              h5: a(class="text-dark text-decoration-none" href=`${basepath}/dashboard`) Surveys
+            for survey in surveys
+              li(class="nav-item")
+                if (selected && selected.uuid === survey.uuid)
+                  a(class="nav-link active" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
+                else
+                  a(class="nav-link" href=`${basepath}/dashboard/${survey.uuid}`) #{survey.title}
 
         div(class="col-md-8 col-lg-9 p-4")
           if selected

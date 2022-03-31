@@ -77,7 +77,7 @@ block surveysContent
             h5 #{item.promptText}
             if item.promptType === 'Textbox'
               textarea(
-                class=(indexedError) ? "form-control is-invalid" : "form-control"
+                class=(indexedError) ? "form-control overflow-auto is-invalid" : "form-control overflow-auto"
                 name=textboxId
                 id=textboxId
                 rows="2"
