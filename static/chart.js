@@ -1,3 +1,6 @@
+import DOMPurify from 'dompurify';
+import { debounce } from '../../static/js/utils';
+
 google.charts.safeLoad({ "packages": ["corechart"] });
 google.charts.setOnLoadCallback(drawSurveyChart);
 

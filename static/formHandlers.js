@@ -1,3 +1,17 @@
+import { addClass, removeClass, hasClass } from '../../static/js/utils';
+import { everyArrayElement } from './utils';
+
+function surveySetup() {
+  // Setup create survey form
+  var createSurveyForm = document.getElementById("3-19-form");
+  if (createSurveyForm) {
+    var addSurveyItem = document.getElementById("sAddSurveyItemBtn");
+    var removeSurveyItem = document.getElementById("sRemoveSurveyItemBtn");
+    addSurveyItem.addEventListener("click", addSurveyItemHandler, false);
+    removeSurveyItem.addEventListener("click", removeSurveyItemHandler, false);
+  }
+}
+
 function addSurveyItemHandler() {
   var form = document.getElementById("3-19-form");
   var itemType = null;
@@ -476,3 +490,10 @@ function closeSurveySubmit(token) {
 function deleteSurveySubmit(token) {
   document.getElementById("4-19-form").submit();
 }
+
+window.createSurveySubmit = createSurveySubmit;
+window.viewSurveySubmit = viewSurveySubmit;
+window.generateTokensSubmit = generateTokensSubmit;
+window.closeSurveySubmit = closeSurveySubmit;
+window.deleteSurveySubmit = deleteSurveySubmit;
+window.addEventListener("load", surveySetup, false);

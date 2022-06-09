@@ -6,3 +6,7 @@ function everyArrayElement(array, el) {
   }
   return true;
 }
+
+export {
+  everyArrayElement
+};
