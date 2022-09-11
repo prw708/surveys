@@ -4,9 +4,7 @@ const cookieOptions = require('../../scripts/cookieOptions');
 const utils = require('../../scripts/utilities');
 const winston = require('../../scripts/log');
 
-const mongoose = require('mongoose');
-const surveyModels = require('../models.js');
-const accountModels = require('../../account/models.js');
+const web = require('../../dbWeb.js');
 
 const BASEPATH = '/projects/surveys';
 
@@ -52,7 +50,7 @@ exports.surveys_home_get = [
       if (errors.isEmpty()) {
         page = data.p - 1;
       }
-      surveyModels.survey.find({ active: true, responseType: 'Members' }).countDocuments().exec()
+      web.survey.find({ active: true, responseType: 'Members' }).countDocuments().exec()
         .then(function(documents) {
           pages = new Array(Math.ceil(documents / pageSize));
           pages = pages.fill(1);
@@ -68,7 +66,7 @@ exports.surveys_home_get = [
             start = pages[page] - viewable;
           }
           pages = pages.slice((start - 1), end);
-          return surveyModels.survey.find({ active: true, responseType: 'Members' })
+          return web.survey.find({ active: true, responseType: 'Members' })
             .sort({ created: 'desc' })
             .skip(page * pageSize)
             .limit(pageSize)
@@ -120,7 +118,7 @@ exports.surveys_home_get = [
 ];
 
 exports.surveys_dashboard_get = function(req, res, next) {
-  surveyModels.survey.find({ owner: req.session.loggedInAsId })
+  web.survey.find({ owner: req.session.loggedInAsId })
     .sort({ created: 'desc' })
     .lean()
     .exec(function(err, surveys) {
@@ -129,7 +127,7 @@ exports.surveys_dashboard_get = function(req, res, next) {
       }
       let counts = [];
       for (let survey of surveys) {
-        counts.push(surveyModels.response.countDocuments({ surveyId: survey.uuid }).exec()
+        counts.push(web.response.countDocuments({ surveyId: survey.uuid }).exec()
           .then(function(count) {
             survey.allResponses = count;
             return Promise.resolve(count);

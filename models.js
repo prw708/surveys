@@ -31,7 +31,7 @@ var ResponseSchema = new Schema({
 });
 
 module.exports = {
-  survey: mongoose.model('Survey', SurveySchema),
-  surveyQuestion: mongoose.model('SurveyQuestion', SurveyQuestionSchema),
-  response: mongoose.model('Response', ResponseSchema)
-}
+  survey: SurveySchema,
+  surveyQuestion: SurveyQuestionSchema,
+  response: ResponseSchema
+};

@@ -6,14 +6,13 @@ const utils = require('../../scripts/utilities');
 const winston = require('../../scripts/log');
 
 const mongoose = require('mongoose');
-const surveyModels = require('../models.js');
-const accountModels = require('../../account/models.js');
+const web = require('../../dbWeb.js');
 
 const BASEPATH = '/projects/surveys';
 
 exports.create_get = function(req, res, next) {
   if (req.session.loggedInAs && req.session.loggedInAsId) {
-    accountModels.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
+    web.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
       .then(function(user) {
         res.render('../surveys/views/create', {
           title: 'Create Survey',
@@ -100,11 +99,11 @@ exports.create_post = [
         return Promise.reject('Failed reCAPTCHA test.');
       })
       .then((success) => {
-        surveyModels.survey.countDocuments({ owner: req.session.loggedInAsId }, function(err, count) {
+        web.survey.countDocuments({ owner: req.session.loggedInAsId }, function(err, count) {
           if (err) {
             handleInsertionError(err, 'An error occurred while creating the survey. Please try again later.');
           } else {
-            accountModels.userLevel.findOne({ user: req.session.loggedInAsId })
+            web.userLevel.findOne({ user: req.session.loggedInAsId })
               .exec(function(err, user) {
                 if (err) {
                   handleInsertionError(err, 'An error occurred while creating the survey. Please try again later.');
@@ -115,7 +114,7 @@ exports.create_post = [
                     if (data.sItem && data.sItem.length > user.maxQuestions) {
                       handleInsertionError(null, 'The maximum amount of questions has been reached.');
                     } else {
-                      let survey = new surveyModels.survey({
+                      let survey = new web.survey({
                         uuid: uuidv4(),
                         owner: req.session.loggedInAsId,
                         created: Date.now(),
@@ -130,7 +129,7 @@ exports.create_post = [
                       let questions = [];
                       if (data.sItem) {
                         for (let i = 0; i < data.sItem.length; i++) {
-                          let surveyQuestion = new surveyModels.surveyQuestion({
+                          let surveyQuestion = new web.surveyQuestion({
                             surveyId: survey.uuid,
                             promptType: data.sRadioItem[i],
                             promptText: data.sItem[i]
@@ -168,7 +167,7 @@ exports.create_post = [
       if (selected.sFirstName || !pastTime) {
         handleInsertionError(JSON.stringify(selected), 'An error occurred while creating the survey. Please try again later.');
       } else {
-        accountModels.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
+        web.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
           .then(function(user) {
             res.render('../surveys/views/create', {
               title: 'Create Survey',
@@ -196,7 +195,7 @@ exports.create_post = [
       if (err) {
         winston.logger.error(err);
       }
-      accountModels.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
+      web.userLevel.findOne({ user: req.session.loggedInAsId }).exec()
         .then(function(user) {
           res.render('../surveys/views/create', {
             title: 'Create Survey',
@@ -249,7 +248,7 @@ exports.uuid_get = [
   function(req, res, next) {
     let errors = validationResult(req);
     let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-    surveyModels.survey.find({ owner: req.session.loggedInAsId })
+    web.survey.find({ owner: req.session.loggedInAsId })
       .sort({ created: 'desc' })
       .exec(function(err, surveys) {
         if (err) {
@@ -258,7 +257,7 @@ exports.uuid_get = [
         if (!errors.isEmpty()) {
           displayOverviewDashboard();
         } else {
-          surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
+          web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
             .populate('questions')
             .lean()
             .exec(function(err, match) {
@@ -289,7 +288,7 @@ exports.uuid_get = [
         function displayOverviewDashboard() {
           let counts = [];
           for (let survey of surveys) {
-            counts.push(surveyModels.response.countDocuments({ surveyId: survey.uuid }).exec()
+            counts.push(web.response.countDocuments({ surveyId: survey.uuid }).exec()
               .then(function(count) {
                 survey.allResponses = count;
                 return Promise.resolve(count);
@@ -330,7 +329,7 @@ exports.view_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
         .populate('questions')
         .exec(function(err, match) {
           if (err) {
@@ -374,7 +373,7 @@ exports.generate_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/confirm', {
@@ -421,12 +420,12 @@ exports.generate_post = [
     .isInt({ min: 1, allow_leading_zeroes: false })
     .toInt(10)
     .custom(function(value, { req }) {
-      return surveyModels.survey.findOne({ uuid: req.params.uuid, owner: req.session.loggedInAsId }).exec()
+      return web.survey.findOne({ uuid: req.params.uuid, owner: req.session.loggedInAsId }).exec()
         .then(function(survey) {
           if (survey === null || survey === undefined) {
             return Promise.reject('An error occurred. Please try again later.');
           } else {
-            return surveyModels.response.countDocuments({ surveyId: survey.uuid, owner: null }).exec()
+            return web.response.countDocuments({ surveyId: survey.uuid, owner: null }).exec()
               .then(function(tokens) {
                 if (tokens === null || tokens === undefined) {
                   return Promise.reject('An error occurred. Please try again later.');
@@ -490,7 +489,7 @@ exports.generate_post = [
         return Promise.reject('Failed reCAPTCHA test.');
       })
       .then((success) => {
-        surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
+        web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
           if (err) {
             handleGenerationError(err, 'An error occurred while generating the tokens. Please try again later.');
           } else if (!match) {
@@ -502,7 +501,7 @@ exports.generate_post = [
           } else {
             let responsePromises = []
             for (let i = 0; i < data.gZIPCode; i++) {
-              let response = new surveyModels.response({
+              let response = new web.response({
                 uuid: uuidv4(),
                 surveyId: match.uuid,
                 owner: null,
@@ -577,7 +576,7 @@ exports.close_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/confirm', {
@@ -654,13 +653,13 @@ exports.close_post = [
       })
       .then((success) => {
         if (data.cWebsite) {
-          surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId, active: true }, function(err, match) {
+          web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId, active: true }, function(err, match) {
             if (err) {
               handleClosingError(err, 'An error occurred while closing. Please try again later.');
             } else if (!match) {
               handleClosingError(null, 'An error occurred while closing. Please try again later.');
             } else {
-              surveyModels.response.find({ surveyId: data.uuid }).exec()
+              web.response.find({ surveyId: data.uuid }).exec()
                 .then(function(responses) {
                   let responsePromises = [];
                   for (response of responses) {
@@ -751,7 +750,7 @@ exports.delete_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/confirm', {
@@ -823,16 +822,16 @@ exports.delete_post = [
       })
       .then((success) => {
         if (data.dPhone) {
-          surveyModels.survey.findOneAndDelete({ uuid: data.uuid, owner: req.session.loggedInAsId }).exec()
+          web.survey.findOneAndDelete({ uuid: data.uuid, owner: req.session.loggedInAsId }).exec()
             .then(function(match) {
               if (!match) {
                 return Promise.reject(null);
               } else {
-                return surveyModels.surveyQuestion.deleteMany({ surveyId: data.uuid }).exec();
+                return web.surveyQuestion.deleteMany({ surveyId: data.uuid }).exec();
               }
             })
             .then(function() {
-              return surveyModels.response.deleteMany({ surveyId: data.uuid }).exec();
+              return web.response.deleteMany({ surveyId: data.uuid }).exec();
             })
             .then(function() {
               res.redirect(BASEPATH + '/dashboard/' + data.uuid + '/delete/confirm');
@@ -895,7 +894,7 @@ exports.tokens_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId }, function(err, match) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/tokens', {
@@ -910,7 +909,7 @@ exports.tokens_get = [
             error: 'No tokens found for this survey.'
           });
         } else {
-          surveyModels.response.find({ surveyId: data.uuid })
+          web.response.find({ surveyId: data.uuid })
             .sort({ created: 'desc' })
             .lean()
             .exec(function(err, responses) {
@@ -982,7 +981,7 @@ exports.results_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
+      web.survey.findOne({ uuid: data.uuid, owner: req.session.loggedInAsId })
         .populate('questions')
         .exec(function(err, survey) {
           if (err) {
@@ -997,7 +996,7 @@ exports.results_get = [
               error: 'The survey does not exist.'
             });
           } else {
-            surveyModels.response.find({ surveyId: data.uuid }, function(err, responses) {
+            web.response.find({ surveyId: data.uuid }, function(err, responses) {
               if (err) {
                 winston.logger.error(err);
                 res.render('../surveys/views/confirm', {
@@ -1075,7 +1074,7 @@ exports.token_uuid_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.response.findOne({ uuid: data.uuid }, function(err, response) {
+      web.response.findOne({ uuid: data.uuid }, function(err, response) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/confirm', {
@@ -1088,7 +1087,7 @@ exports.token_uuid_get = [
             error: 'The token does not exist.'
           });
         } else {
-          surveyModels.survey.findOne({ uuid: response.surveyId })
+          web.survey.findOne({ uuid: response.surveyId })
             .populate('questions')
             .exec(function(err, survey) {
               if (err) {
@@ -1183,7 +1182,7 @@ exports.token_uuid_post = [
         error: 'The token does not exist.'
       });
     } else {
-      surveyModels.response.findOne({ uuid: data.uuid }, function(err, response) {
+      web.response.findOne({ uuid: data.uuid }, function(err, response) {
         if (err) {
           winston.logger.error(err);
           res.render('../surveys/views/confirm', {
@@ -1196,7 +1195,7 @@ exports.token_uuid_post = [
             error: 'The token does not exist.'
           });
         } else {
-          surveyModels.survey.findOne({ uuid: response.surveyId })
+          web.survey.findOne({ uuid: response.surveyId })
             .populate(['owner', 'questions'])
             .exec(function(err, survey) {
               if (err) {
@@ -1293,9 +1292,9 @@ exports.token_uuid_post = [
                     response.active = false;
                     response.responses = orderedData;
                     survey.responsesCompleted++;
-                    accountModels.user.findById(survey.owner).exec()
+                    web.user.findById(survey.owner).exec()
                       .then(function(user) {
-                        return accountModels.userLevel.findOne({ user: survey.owner }).exec();
+                        return web.userLevel.findOne({ user: survey.owner }).exec();
                       })
                       .then(function(userLevel) {
                         userLevel.experience++;
@@ -1362,7 +1361,7 @@ exports.survey_response_get = [
       });
     } else {
       let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
-      surveyModels.survey.findOne({ uuid: data.uuid, responseType: 'Members' })
+      web.survey.findOne({ uuid: data.uuid, responseType: 'Members' })
         .populate('questions')
         .exec(function(err, survey) {
           if (err) {
@@ -1383,9 +1382,9 @@ exports.survey_response_get = [
               surveyActive: survey.active,
             });
           } else {
-            accountModels.user.findById(req.session.loggedInAsId).exec()
+            web.user.findById(req.session.loggedInAsId).exec()
               .then(function(user) {
-                return surveyModels.response.findOne({ surveyId: survey.uuid, owner: user._id }).exec();
+                return web.response.findOne({ surveyId: survey.uuid, owner: user._id }).exec();
               })
               .then(function(existingResponse) {
                 if (existingResponse) {
@@ -1476,7 +1475,7 @@ exports.survey_response_post = [
         error: 'The survey does not exist.'
       });
     } else {
-      surveyModels.survey.findOne({ uuid: data.uuid, responseType: 'Members' })
+      web.survey.findOne({ uuid: data.uuid, responseType: 'Members' })
         .populate(['owner', 'questions'])
         .exec(function(err, survey) {
           if (err) {
@@ -1497,7 +1496,7 @@ exports.survey_response_post = [
               surveyActive: survey.active,
             });
           } else {
-            accountModels.user.findById(req.session.loggedInAsId, function(err, user) {
+            web.user.findById(req.session.loggedInAsId, function(err, user) {
               if (err) {
                 winston.logger.error(err);
                 res.render('../surveys/views/confirm', {
@@ -1505,7 +1504,7 @@ exports.survey_response_post = [
                   error: 'An error occurred while saving the response. Please try again later.'
                 });
               } else {
-                surveyModels.response.findOne({ surveyId: survey.uuid, owner: user._id }, function(err, existingResponse) {
+                web.response.findOne({ surveyId: survey.uuid, owner: user._id }, function(err, existingResponse) {
                   if (err) {
                     winston.logger.error(err);
                     res.render('../surveys/views/confirm', {
@@ -1531,7 +1530,7 @@ exports.survey_response_post = [
                       return Promise.reject('Failed reCAPTCHA test.');
                     })
                     .then((success) => {
-                      let response = new surveyModels.response({
+                      let response = new web.response({
                         uuid: uuidv4(),
                         surveyId: survey.uuid,
                         owner: user._id,
@@ -1602,9 +1601,9 @@ exports.survey_response_post = [
                         response.active = false;
                         response.responses = orderedData;
                         survey.responsesCompleted++;
-                        accountModels.user.findById(survey.owner).exec()
+                        web.user.findById(survey.owner).exec()
                           .then(function(user) {
-                            return accountModels.userLevel.findOne({ user: survey.owner }).exec();
+                            return web.userLevel.findOne({ user: survey.owner }).exec();
                           })
                           .then(function(userLevel) {
                             userLevel.experience++;
