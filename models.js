@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var SurveyQuestionSchema = new Schema({
+let SurveyQuestionSchema = new Schema({
   surveyId: { type: String, required: true },
   promptType: { type: String, required: true, enum: ['Textbox', 'Rating', 'YesNo'] },
   promptText: { type: String, required: true, minlength: 1, maxlength: 150 }
 });
 
-var SurveySchema = new Schema({
+let SurveySchema = new Schema({
   uuid: { type: String, required: true, index: true, unique: true },
   owner: { type: Schema.Types.ObjectId, ref: 'User' },
   created: { type: Date, default: Date.now() },
@@ -20,7 +20,7 @@ var SurveySchema = new Schema({
   maxTokens: { type: Number, required: true }
 });
 
-var ResponseSchema = new Schema({
+let ResponseSchema = new Schema({
   uuid: { type: String, required: true, index: true, unique: true },
   surveyId: { type: String, required: true },
   owner: { type: Schema.Types.ObjectId, ref: 'User' },

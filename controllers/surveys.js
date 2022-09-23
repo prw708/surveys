@@ -38,17 +38,15 @@ exports.create_post = [
   body('sWebsite', 'Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, -, and spaces.')
     .trim()
     .isLength({ min: 1, max: 50 })
-    .matches(/^[A-Za-z0-9 \-]+$/)
-    .whitelist('A-Za-z0-9 \\-')
-    .escape(),
+    .matches(/^[A-Za-z0-9 \-\.\?!,"']+$/)
+    .whitelist('A-Za-z0-9 \.\?!,"\'\\-'),
   // Description
-  body('sAddress', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
+  body('sAddress', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!"\', and spaces.')
     .trim()
     .optional()
     .isLength({ max: 150 })
-    .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9\-\.\?!,"'\s]*$/)
+    .whitelist('A-Za-z0-9\\-\.\?!,"\'\\s'),
   // Responses
   body('sLastName', 'Must be a valid response type.')
     .trim()
@@ -58,12 +56,11 @@ exports.create_post = [
     .trim()
     .isIn(['Textbox', 'Rating', 'YesNo'])
     .escape(),
-  body('sItem.*', 'Must be between 1 to 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
+  body('sItem.*', 'Must be between 1 to 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!"\', and spaces.')
     .trim()
     .isLength({ min: 1, max: 150 })
-    .matches(/^[A-Za-z0-9\-\.\?!,\s]+$/)
-    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9\-\.\?!,"'\s]+$/)
+    .whitelist('A-Za-z0-9\\-\.\?!,"\'\\s'),
   body('time', 'Invalid value.')
     .trim()
     .escape()
@@ -1137,12 +1134,11 @@ exports.token_uuid_post = [
     .matches(/^[A-Fa-f0-9\-]{36}$/)
     .whitelist('A-Fa-f0-9\\-')
     .escape(),
-  body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
+  body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!"\', and spaces.')
     .trim()
     .isLength({ max: 150 })
-    .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9\-\.\?!,"'\s]*$/)
+    .whitelist('A-Za-z0-9\\-\.\?!,"\'\\s'),
   body('sRating.*', 'Must be an integer from 1 to 5.')
     .trim()
     .escape()
@@ -1428,12 +1424,11 @@ exports.survey_response_post = [
     .matches(/^[A-Fa-f0-9\-]{36}$/)
     .whitelist('A-Fa-f0-9\\-')
     .escape(),
-  body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.')
+  body('sTextbox.*', 'Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!"\', and spaces.')
     .trim()
     .isLength({ max: 150 })
-    .matches(/^[A-Za-z0-9\-\.\?!,\s]*$/)
-    .whitelist('A-Za-z0-9\\-\.\?!,\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9\-\.\?!,"'\s]*$/)
+    .whitelist('A-Za-z0-9\\-\.\?!,"\'\\s'),
   body('sRating.*', 'Must be an integer from 1 to 5.')
     .trim()
     .escape()

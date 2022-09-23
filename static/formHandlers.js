@@ -102,15 +102,15 @@ function createSurveyFormHandler() {
     radioValues[i] = form.elements["sRadioItem" + i].value;
   }
   var testTitle = titleValue.length > 0 && titleValue.length < 50;
-  testTitle = testTitle && /^[A-Za-z0-9 \-]+$/.test(titleValue);
+  testTitle = testTitle && /^[A-Za-z0-9 \-\.\?,!'"]+$/.test(titleValue);
   var testDescription = descriptionValue.length < 150;
-  testDescription = testDescription && /^[A-Za-z0-9\-\.\?!,\s]*$/.test(descriptionValue);
+  testDescription = testDescription && /^[A-Za-z0-9\-\.\?!,'"\s]*$/.test(descriptionValue);
   var testResponses = responsesValue && responsesValue.length > 0 && responsesValue.length < 50;
   testResponses = testResponses && /^[A-Za-z0-9 \-]+$/.test(responsesValue);
   var testValues = [], testRadios = [];
   for (var i = 0; i < itemValues.length; i++) {
     testValues[i] = itemValues[i].length > 0 && itemValues[i].length < 150;
-    testValues[i] = testValues[i] && /^[A-Za-z0-9\-\.\?!,\s]+$/.test(itemValues[i]);
+    testValues[i] = testValues[i] && /^[A-Za-z0-9\-\.\?!,'"\s]+$/.test(itemValues[i]);
     testRadios[i] = radioValues[i] === "Textbox" || radioValues[i] === "Rating" || radioValues[i] === "YesNo";
   }
   if (document.getElementById("sErrorDiv")) {
@@ -136,7 +136,7 @@ function createSurveyFormHandler() {
       var error = document.createElement("div");
       error.id = titleName + "InputFeedback";
       addClass(error, "invalid-feedback");
-      error.textContent = "Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, -, and spaces.";
+      error.textContent = "Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, ,-.?!\"', and spaces.";
       form.elements[titleName].setAttribute("aria-describedby", titleName + "InputFeedback");
       form.elements[titleName].parentNode.appendChild(error);
     }
@@ -155,7 +155,7 @@ function createSurveyFormHandler() {
       var error = document.createElement("div");
       error.id = descriptionName + "InputFeedback";
       addClass(error, "invalid-feedback");
-      error.textContent = "Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.";
+      error.textContent = "Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!\"', and spaces.";
       form.elements[descriptionName].setAttribute("aria-describedby", descriptionName + "InputFeedback");
       form.elements[descriptionName].parentNode.appendChild(error);
     }
@@ -209,7 +209,7 @@ function createSurveyFormHandler() {
         var error = document.createElement("div");
         error.id = itemId + "InputFeedback";
         addClass(error, "invalid-feedback");
-        error.textContent = "Must be between 1 to 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.";
+        error.textContent = "Must be between 1 to 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!\"', and spaces.";
         form.elements[itemId].setAttribute("aria-describedby", itemId + "InputFeedback");
         form.elements[itemId].parentNode.appendChild(error);
       }
@@ -298,7 +298,7 @@ function viewSurveyFormHandler() {
   var testTextboxes = [], testRatings = [], testYesNos = [];
   for (var i = 0; i < textboxValues.length; i++) {
     testTextboxes[i] = textboxValues[i].length < 150;
-    testTextboxes[i] = testTextboxes[i] && /^[A-Za-z0-9\-\.\?!,\s]*$/.test(textboxValues[i]);
+    testTextboxes[i] = testTextboxes[i] && /^[A-Za-z0-9\-\.\?!,"'\s]*$/.test(textboxValues[i]);
   }
   for (var i = 0; i < ratingValues.length; i++) {
     testRatings[i] = /^[1-5]{1}$/.test(ratingValues[i]);
@@ -336,7 +336,7 @@ function viewSurveyFormHandler() {
           var error = document.createElement("div");
           error.id = itemId + "InputFeedback";
           addClass(error, "invalid-feedback");
-          error.textContent = "Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!, and spaces.";
+          error.textContent = "Must be less than 150 characters. Can contain A-Z, a-z, 0-9, ,-.?!\"', and spaces.";
           textbox.setAttribute("aria-describedby", itemId + "InputFeedback");
           textbox.parentNode.appendChild(error);
         }
