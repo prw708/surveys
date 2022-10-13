@@ -21,9 +21,9 @@ block surveysContent
       for item in survey.questions
         - i++;
         if (i === 0)
-          h5(class="pt-4") #{item.promptText}
+          h5(class="pt-4 preserve-white-space") #{item.promptText}
         else
-          h5 #{item.promptText}
+          h5(class="preserve-white-space") #{item.promptText}
         if item.promptType === 'Textbox'
           div(class="row g-0 pb-4")
             textarea(class="form-control overflow-auto" rows="10" disabled)

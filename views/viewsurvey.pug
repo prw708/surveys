@@ -74,7 +74,7 @@ block surveysContent
               indexedError = errors[i];
             }
           div(class="mb-4")
-            h5 #{item.promptText}
+            h5(class="preserve-white-space") #{item.promptText}
             if item.promptType === 'Textbox'
               textarea(
                 class=(indexedError) ? "form-control overflow-auto is-invalid" : "form-control overflow-auto"
